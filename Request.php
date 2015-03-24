@@ -20,8 +20,20 @@ use Exception;
  */
 class Request
 {
+    /**
+     * Data. May be string, array
+     * @var mixed
+     */
     public $postData = null;
+    /**
+     * Url to response.
+     * @var string
+     */
     public $url = null;
+    /**
+     * POST or GET
+     * @var string
+     */
     public $method = 'POST';
 
     /**
@@ -74,6 +86,10 @@ class Request
     {
         if (empty($this->postData) || empty($postDataJson)) {
             throw new Exception('`postData` it is not correct.');
+        }
+
+        if (empty($this->method) || in_array($this->method, ['POST', 'GET'])) {
+            throw new Exception('`method` it is not be null or in `POST`, `GET`');
         }
 
         if (empty($this->url)) {
