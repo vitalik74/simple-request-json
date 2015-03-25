@@ -58,10 +58,14 @@ class Request
     public function getResponse()
     {
         try {
-            $validJson = json_decode($this->postData);
+            if (is_string($this->postData)) {
+                $validJson = json_decode($this->postData);
 
-            if (!empty($validJson)) { // it is valid JSON
-                $postDataJson = $this->postData;
+                if (!empty($validJson)) { // it is valid JSON
+                    $postDataJson = $this->postData;
+                } else {
+                    $postDataJson = json_encode($this->postData);
+                }
             } else {
                 $postDataJson = json_encode($this->postData);
             }
