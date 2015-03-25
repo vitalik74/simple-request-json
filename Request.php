@@ -60,7 +60,7 @@ class Request
         try {
             $postDataJson = json_encode($this->postData);
 
-            $this->checkPropertys($postDataJson);
+            $this->checkProperties($postDataJson);
 
             $context = stream_context_create(array(
                 'http' => array(
@@ -82,13 +82,13 @@ class Request
      * @param $postDataJson
      * @throws Exception
      */
-    private function checkPropertys($postDataJson)
+    private function checkProperties($postDataJson)
     {
         if (empty($this->postData) || empty($postDataJson)) {
             throw new Exception('`postData` it is not correct.');
         }
 
-        if (empty($this->method) || in_array($this->method, ['POST', 'GET'])) {
+        if (empty($this->method) || !in_array($this->method, ['POST', 'GET'])) {
             throw new Exception('`method` it is not be null or in `POST`, `GET`');
         }
 
