@@ -58,14 +58,20 @@ class Request
     public function getResponse()
     {
         try {
-            $postDataJson = json_encode($this->postData);
+            $validJson = json_decode($this->postData);
+
+            if (!empty($validJson)) { // it is valid JSON
+                $postDataJson = $this->postData;
+            } else {
+                $postDataJson = json_encode($this->postData);
+            }
 
             $this->checkProperties($postDataJson);
 
             $context = stream_context_create(array(
                 'http' => array(
                     'method' => $this->method,
-                    'header' => 'Content-Type: application/json',
+                    'header'  => "Content-type: application/json\r\n",
                     'content' => $postDataJson
                 )
             ));
