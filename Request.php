@@ -71,16 +71,7 @@ class Request
             }
 
             $this->checkProperties($postDataJson);
-
-            $context = stream_context_create(array(
-                'http' => array(
-                    'method' => $this->method,
-                    'header'  => "Content-type: application/json\r\n",
-                    'content' => $postDataJson
-                )
-            ));
-            $response = file_get_contents($this->url, false, $context);
-            $responseData = json_decode($response, true);
+            $responseData = $this->checkCurl() ? $this->getResponseWithCurl($postDataJson) : $this->getResponseWithGetsContent($postDataJson);
 
             return $responseData;
         } catch (Exception $e) {
@@ -105,5 +96,56 @@ class Request
         if (empty($this->url)) {
             throw new Exception('`url` it is not be null.');
         }
+    }
+
+    /**
+     * Curl is installed in system
+     * @return bool
+     */
+    private function checkCurl()
+    {
+        return function_exists('curl_version');
+    }
+
+    /**
+     * Get data from Curl
+     * @param $postDataJson
+     * @return mixed
+     */
+    private function getResponseWithCurl($postDataJson)
+    {
+        $ch = curl_init($this->url);
+        curl_setopt_array($ch, array(
+            CURLOPT_POST => $this->method == 'POST' ? true : false,
+            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+            ),
+            CURLOPT_POSTFIELDS => $postDataJson
+        ));
+        $response = curl_exec($ch);
+        $responseData = json_decode($response, TRUE);
+
+        return $responseData;
+    }
+
+    /**
+     * Get data from file_get_contents
+     * @param $postDataJson
+     * @return mixed
+     */
+    private function getResponseWithGetsContent($postDataJson)
+    {
+        $context = stream_context_create(array(
+            'http' => array(
+                'method' => $this->method,
+                'header'  => "Content-type: application/json\r\n",
+                'content' => $postDataJson
+            )
+        ));
+        $response = file_get_contents($this->url, false, $context);
+        $responseData = json_decode($response, true);
+
+        return $responseData;
     }
 }
