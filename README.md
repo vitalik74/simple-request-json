@@ -27,7 +27,7 @@ USE
 
 Data request run from Curl in default. If Curl not installed in system data request run from `file_get_contents` function.
 
-### Example with use:
+### Example, how to use:
 ```
 $response = (new Request(['url' => 'Url ', 'postData' => 'post data']))->getResponse();
 ```

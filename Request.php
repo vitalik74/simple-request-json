@@ -5,9 +5,7 @@
 
 namespace vitalik74\request;
 
-
 use Exception;
-
 
 /**
  * Simple class implement request with JSON body.
