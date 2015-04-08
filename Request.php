@@ -33,6 +33,11 @@ class Request
      * @var string
      */
     public $method = 'POST';
+    /**
+     * Convert response from server to array with json_decode function
+     * @var bool
+     */
+    public $toArray = true;
 
     /**
      * Constructor
@@ -69,7 +74,7 @@ class Request
             }
 
             $this->checkProperties($postDataJson);
-            $responseData = $this->checkCurl() ? $this->getResponseWithCurl($postDataJson) : $this->getResponseWithGetsContent($postDataJson);
+            $responseData = $this->checkCurl() ? $this->getResponseWithCurl($postDataJson) : $this->getResponseWithGetContents($postDataJson);
 
             return $responseData;
         } catch (Exception $e) {
@@ -122,7 +127,7 @@ class Request
             CURLOPT_POSTFIELDS => $postDataJson
         ));
         $response = curl_exec($ch);
-        $responseData = json_decode($response, TRUE);
+        $responseData = $this->convertData($response);
 
         return $responseData;
     }
@@ -132,7 +137,7 @@ class Request
      * @param $postDataJson
      * @return mixed
      */
-    private function getResponseWithGetsContent($postDataJson)
+    private function getResponseWithGetContents($postDataJson)
     {
         $context = stream_context_create(array(
             'http' => array(
@@ -142,8 +147,18 @@ class Request
             )
         ));
         $response = file_get_contents($this->url, false, $context);
-        $responseData = json_decode($response, true);
+        $responseData = $this->convertData($response);
 
         return $responseData;
+    }
+
+    /**
+     * Convert response from server to array with json_decode function
+     * @param $response
+     * @return mixed
+     */
+    private function convertData($response)
+    {
+        return $this->toArray ? json_decode($response, true) : $response;
     }
 }

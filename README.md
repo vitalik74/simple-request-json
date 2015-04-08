@@ -49,3 +49,13 @@ $response->method = 'GET';// default in POST
 $response = $response->getResponse();
 ```
 
+
+### Public property
+
+```$postData``` - Post data to put in server.  
+
+```$url``` - Url from server.
+
+```$method``` - POST or GET method.
+
+```$toArray``` - Convert response from server to array with json_decode function
