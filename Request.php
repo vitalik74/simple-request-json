@@ -38,6 +38,11 @@ class Request
      * @var bool
      */
     public $toArray = true;
+    /**
+     * If you no set data set this property to true
+     * @var bool
+     */
+    public $noData = false;
 
     /**
      * Constructor
@@ -88,7 +93,7 @@ class Request
      */
     private function checkProperties($postDataJson)
     {
-        if (empty($this->postData) || empty($postDataJson)) {
+        if ((empty($this->postData) || empty($postDataJson) && empty($this->noData))) {
             throw new Exception('`postData` it is not correct.');
         }
 
