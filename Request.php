@@ -43,6 +43,11 @@ class Request
      * @var bool
      */
     public $noData = false;
+    /**
+     * Send to server with json format (add special header)
+     * @var bool
+     */
+    public $sendToJsonFormat = true;
 
     /**
      * Constructor
@@ -61,23 +66,28 @@ class Request
     }
 
     /**
+     * Get responce from server
      * @return mixed
      */
     public function getResponse()
     {
         try {
-            if (is_string($this->postData)) {
-                $validJson = json_decode($this->postData);
+            if (!empty($this->sendToJsonFormat)) {
+                if (is_string($this->postData)) {
+                    $validJson = json_decode($this->postData);
 
-                if (!empty($validJson)) { // it is valid JSON
-                    $postDataJson = $this->postData;
+                    if (!empty($validJson)) { // it is valid JSON
+                        $postDataJson = $this->postData;
+                    } else {
+                        $postDataJson = json_encode($this->postData);
+                    }
                 } else {
                     $postDataJson = json_encode($this->postData);
                 }
             } else {
-                $postDataJson = json_encode($this->postData);
+                $postDataJson = $this->postData;
             }
-
+            //@todo replace $postDataJson to $postData
             $this->checkProperties($postDataJson);
             $responseData = $this->checkCurl() ? $this->getResponseWithCurl($postDataJson) : $this->getResponseWithGetContents($postDataJson);
 
@@ -88,6 +98,7 @@ class Request
     }
 
     /**
+     * Check to correct propertys
      * @param $postDataJson
      * @throws Exception
      */
@@ -107,7 +118,7 @@ class Request
     }
 
     /**
-     * Curl is installed in system
+     * Curl is installed in system?
      * @return bool
      */
     private function checkCurl()
@@ -123,14 +134,19 @@ class Request
     private function getResponseWithCurl($postDataJson)
     {
         $ch = curl_init($this->url);
-        curl_setopt_array($ch, array(
+        $options = array(
             CURLOPT_POST => $this->method == 'POST' ? true : false,
             CURLOPT_RETURNTRANSFER => TRUE,
-            CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json'
-            ),
             CURLOPT_POSTFIELDS => $postDataJson
-        ));
+        );
+
+        if (!empty($this->sendToJsonFormat)) {
+            $options = array_merge($options, array(CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+            )));
+        }
+
+        curl_setopt_array($ch, $options);
         $response = curl_exec($ch);
         $responseData = $this->convertData($response);
 
@@ -144,12 +160,17 @@ class Request
      */
     private function getResponseWithGetContents($postDataJson)
     {
+        $options = array(
+            'method' => $this->method,
+            'content' => $postDataJson
+        );
+
+        if (!empty($this->sendToJsonFormat)) {
+            $options = array_merge($options, array('header'  => "Content-type: application/json\r\n",));
+        }
+
         $context = stream_context_create(array(
-            'http' => array(
-                'method' => $this->method,
-                'header'  => "Content-type: application/json\r\n",
-                'content' => $postDataJson
-            )
+            'http' => $options
         ));
         $response = file_get_contents($this->url, false, $context);
         $responseData = $this->convertData($response);

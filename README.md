@@ -4,7 +4,7 @@
 REQUIREMENTS
 ------------
 
-The minimum requirement by this application template that your Web server supports PHP 5.3.0.
+The minimum requirement by this application template that your Web server supports PHP 5.4.0.
 
 
 INSTALLATION
