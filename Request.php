@@ -93,7 +93,7 @@ class Request
      */
     private function checkProperties($postDataJson)
     {
-        if ((empty($this->postData) || empty($postDataJson) && empty($this->noData))) {
+        if ((empty($this->postData) || empty($postDataJson)) && empty($this->noData)) {
             throw new Exception('`postData` it is not correct.');
         }
 
