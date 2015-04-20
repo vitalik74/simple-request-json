@@ -59,3 +59,7 @@ $response = $response->getResponse();
 ```$method``` - POST or GET method.
 
 ```$toArray``` - Convert response from server to array with json_decode function
+
+```$noData``` - If you no set data set this property to true
+
+```$sendToJsonFormat``` - Send to server with json format (add special header)

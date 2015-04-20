@@ -133,7 +133,7 @@ class Request
      */
     private function getResponseWithCurl($postDataJson)
     {
-        $ch = curl_init($this->url);
+        $ch = curl_init($this->getCorrectUrl());
         $options = array(
             CURLOPT_POST => $this->method == 'POST' ? true : false,
             CURLOPT_RETURNTRANSFER => TRUE,
@@ -172,7 +172,7 @@ class Request
         $context = stream_context_create(array(
             'http' => $options
         ));
-        $response = file_get_contents($this->url, false, $context);
+        $response = file_get_contents($this->getCorrectUrl(), false, $context);
         $responseData = $this->convertData($response);
 
         return $responseData;
@@ -186,5 +186,13 @@ class Request
     private function convertData($response)
     {
         return $this->toArray ? json_decode($response, true) : $response;
+    }
+
+    /**
+     * @return string
+     */
+    private function getCorrectUrl()
+    {
+        return $this->method == 'GET' ? $this->url . '?' . join('&', array_map(function ($v, $k) { return $k . '=' . $v; }, $this->postData, array_keys($this->postData))) : $this->url;
     }
 }
