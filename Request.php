@@ -139,18 +139,14 @@ class Request
         );
 
         if ($this->method == 'POST') {
-            $options = array_merge($options, array(
-                CURLOPT_POST => $this->method == 'POST' ? true : false,
-                CURLOPT_POSTFIELDS => $postDataJson
-            ));
+            $options[CURLOPT_POST] = $this->method == 'POST' ? true : false;
+            $options[CURLOPT_POSTFIELDS] = $postDataJson;
         }
 
         if (!empty($this->sendToJsonFormat)) {
-            $options = array_merge($options, array(
-                CURLOPT_HTTPHEADER => array(
-                    'Content-Type: application/json'
-                )
-            ));
+            $options[CURLOPT_HTTPHEADER] = array(
+                'Content-Type: application/json'
+            );
         }
 
         curl_setopt_array($ch, $options);
